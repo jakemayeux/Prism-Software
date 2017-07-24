@@ -13,7 +13,7 @@ infile = 'ZMixingIn.gcode'
 
 outfile = 'ZMixingOut.gcode'
 
-colorfiles = 'color-codes'
+colorfile = 'color-codes'
 
 maxZ = float(-1.0)
 
@@ -25,7 +25,7 @@ zpos = float(0.0)
 
 numColors = -1 # -1 to use all colors from the color code file
 
-numExtruders = 16 
+numExtruders = 16 # number of virtual extruders our printer can handle
 
 opts, extraparams = getopt.getopt(
    sys.argv[1:],
@@ -40,9 +40,30 @@ for o, p in opts:
       outfile = p
 
 inf = open(infile, 'r')
+cof = open(colorfile, 'r')
 ouf = open(outfile, 'w')
 
 lines = inf.readlines()
+colors = cof.readlines()
+
+# change the mixing ratios of the virtual extruders to colors defined in the color-codes file
+def setColors(start, length):
+    s = 0
+    i = 0
+    for l in colors[start:start+length]:
+        for c in l:
+            if c != '\n':
+                ouf.write('M163 S'+str(s)+' P'+c+'\n')
+                print('M163 S'+str(s)+' P'+c)
+                s += 1
+        s = 0
+        ouf.write('M164 S'+str(i)+'\n\n')
+        print('M164 S'+str(i)+'\n')
+        i += 1
+
+
+#setColors(32,16)
+#sys.exit()
 
 def getValue(line, key, default=None):
     if (key not in line) or (';' in line and line.find(key) > line.find(';')):
@@ -75,11 +96,17 @@ for x in reversed(range(len(lines))):
       if (maxZ != -1):
          break
 
-swapHeight = maxZ / numExtruders
+if numColors == -1:
+    numSwaps = len(colors)
+else:
+    numColors = numExtruders
+
+swapHeight = maxZ / numSwaps
 nextSwap = swapHeight
 print(maxZ)
 print(swapHeight)
 
+numResets = 0
 ct = 0 # current T
 ouf.write('T'+str(ct)+'\n')
 for l in lines:
@@ -103,12 +130,15 @@ for l in lines:
          elif (zpos > 0):
             zpos = newz
             # new layer here
-            #print(zpos)
             if (zpos >= nextSwap):
                nextSwap += swapHeight
                print(nextSwap)
                ct += 1
                ouf.write('T'+str(ct)+'\n')
+               if ct >= numExtruders-1 :
+                  ct = -1
+                  numResets += 1
+                  setColors(numExtruders*numResets, numExtruders)        
    elif (gc[0:1] == 'T'):
       tn = int(gc[1:])
       if (ltn == -1):
@@ -116,6 +146,4 @@ for l in lines:
       elif (tn != ltn):
          # swap here
          ltn = tn
-         if (zpos > 0):
-            drawNextTower()
    ouf.write(l)
