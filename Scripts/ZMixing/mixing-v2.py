@@ -13,7 +13,7 @@ infile = 'ZMixingIn.gcode'
 
 outfile = 'ZMixingOut.gcode'
 
-colorfile = 'color-codes'
+colorfile = 'color-codes.txt'
 
 maxZ = float(-1.0)
 
