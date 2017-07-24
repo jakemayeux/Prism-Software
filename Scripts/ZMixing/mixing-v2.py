@@ -9,7 +9,7 @@ from os import walk
 
 absolute = -1
 
-infile = 'ZMixingIn.gcode'
+infile = 'TestPart.gcode'
 
 outfile = 'ZMixingOut.gcode'
 
@@ -54,11 +54,11 @@ def setColors(start, length):
         for c in l:
             if c != '\n':
                 ouf.write('M163 S'+str(s)+' P'+c+'\n')
-                print('M163 S'+str(s)+' P'+c)
+                #print('M163 S'+str(s)+' P'+c)
                 s += 1
         s = 0
         ouf.write('M164 S'+str(i)+'\n\n')
-        print('M164 S'+str(i)+'\n')
+        #print('M164 S'+str(i)+'\n')
         i += 1
 
 
@@ -105,9 +105,11 @@ swapHeight = maxZ / numSwaps
 nextSwap = swapHeight
 print(maxZ)
 print(swapHeight)
+print(numSwaps)
 
 numResets = 0
 ct = 0 # current T
+first = True
 #ouf.write('T'+str(ct)+'\n')
 for l in lines:
    i = l.find(' ')
@@ -132,7 +134,7 @@ for l in lines:
             # new layer here
             if (zpos >= nextSwap):
                nextSwap += swapHeight
-               print(nextSwap)
+               #print(nextSwap)
                ct += 1
                ouf.write('T'+str(ct)+'\n')
                if ct >= numExtruders-1 :
@@ -146,4 +148,8 @@ for l in lines:
       elif (tn != ltn):
          # swap here
          ltn = tn
+   # print first Tn after first G92
    ouf.write(l)
+   if (gc == 'G92' and first):
+      first = False
+      ouf.write('T0\n')
