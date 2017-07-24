@@ -9,7 +9,7 @@ from os import walk
 
 absolute = -1
 
-infile = 'TestPart.gcode'
+infile = 'ZMixingIn.gcode'
 
 outfile = 'ZMixingOut.gcode'
 
