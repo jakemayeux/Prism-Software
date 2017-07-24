@@ -107,7 +107,7 @@ print(maxZ)
 print(swapHeight)
 print(numSwaps)
 
-numResets = 1
+numResets = 0
 setColors(numExtruders*numResets, numExtruders)        
 ct = 0 # current T
 first = True
