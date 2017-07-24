@@ -108,7 +108,7 @@ print(swapHeight)
 
 numResets = 0
 ct = 0 # current T
-ouf.write('T'+str(ct)+'\n')
+#ouf.write('T'+str(ct)+'\n')
 for l in lines:
    i = l.find(' ')
    if (i == -1):
