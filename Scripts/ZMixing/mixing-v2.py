@@ -136,7 +136,7 @@ for l in lines:
             if (zpos >= nextSwap):
                nextSwap += swapHeight
                #print(nextSwap)
-               if ct == 0:
+               if ct == -1:
                   numResets += 1
                   setColors(numExtruders*numResets, numExtruders)        
                ct += 1
