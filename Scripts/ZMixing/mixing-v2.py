@@ -14,6 +14,8 @@ infile = 'ZMixingIn.gcode'
 
 outfile = 'ZMixingOut.gcode'
 
+colorfiles = 'color-codes'
+
 maxZ = float(-1.0)
 
 zhop = float(1.0) # needed to properly detect layer changes
@@ -21,6 +23,8 @@ zhop = float(1.0) # needed to properly detect layer changes
 zpos = float(0.0)
 
 #lastz = float(-1.0)
+
+numColors = -1 # -1 to use all colors from the color code file
 
 numExtruders = 16 
 
