@@ -9,7 +9,6 @@ from os import walk
 
 absolute = -1
 
-
 infile = 'ZMixingIn.gcode'
 
 outfile = 'ZMixingOut.gcode'

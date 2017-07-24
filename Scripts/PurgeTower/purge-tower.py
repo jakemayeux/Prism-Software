@@ -120,7 +120,8 @@ def drawNextTower():
    else:
       for l in towers[swaps]:
          # dont write lines that move the Z or reset the extruder
-         if (l.find('Z') == -1 and l.find('G92') == -1):
+         #if (l.find('Z') == -1 and l.find('G92') == -1):
+         if (l.find('Z') == -1):
             ouf.write(l)
    swaps += 1
 
