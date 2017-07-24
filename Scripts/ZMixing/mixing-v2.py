@@ -136,19 +136,14 @@ for l in lines:
             if (zpos >= nextSwap):
                nextSwap += swapHeight
                #print(nextSwap)
-               ct += 1
-               ouf.write('T'+str(ct)+'\n')
-               if ct >= numExtruders-1 :
-                  ct = -1
+               if ct == 0:
                   numResets += 1
                   setColors(numExtruders*numResets, numExtruders)        
-   elif (gc[0:1] == 'T'):
-      tn = int(gc[1:])
-      if (ltn == -1):
-         ltn = tn
-      elif (tn != ltn):
-         # swap here
-         ltn = tn
+               ct += 1
+               ouf.write('T'+str(ct)+'\n')
+               if ct >= numExtruders-1:
+                  ct = -1
+
    # print first Tn after first G92
    ouf.write(l)
    if (gc == 'G92' and first):
