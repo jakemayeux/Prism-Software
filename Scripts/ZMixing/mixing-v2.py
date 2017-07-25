@@ -77,7 +77,7 @@ def getValue(line, key, default=None):
     except ValueError:
         return default
 
-# iterate through lines from last to first
+# iterate through lines from last to firstG92
 for x in reversed(range(len(lines))):
    l = lines[x]
    i = l.find(' ')
@@ -108,9 +108,9 @@ print(swapHeight)
 print(numSwaps)
 
 numResets = 0
-setColors(numExtruders*numResets, numExtruders)        
 ct = 0 # current T
-first = True
+firstG92 = True
+firstG28 = True
 #ouf.write('T'+str(ct)+'\n')
 for l in lines:
    i = l.find(' ')
@@ -144,8 +144,11 @@ for l in lines:
                if ct >= numExtruders-1:
                   ct = -1
 
-   # print first Tn after first G92
+   # print firstG92 Tn after first G92
    ouf.write(l)
-   if (gc == 'G92' and first):
-      first = False
+   if (gc == 'G92' and firstG92):
+      firstG92 = False
       ouf.write('T0\n')
+   if (gc == 'G28' and firstG28):
+      firstG28 = False
+      setColors(numExtruders*numResets, numExtruders)        
