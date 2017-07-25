@@ -15,9 +15,9 @@ using namespace std;
 float getValue(string l, char key){
 	smatch m;
 	string s;
-
-	if(l.find(key) != -1){
-		s = l.substr(l.find(key)+1,13); // 13 should be enough
+	int pos = l.find(key);
+	if(pos != -1){
+		s = l.substr(pos+1,13); // 13 should be enough
 	}else{
 		return nanf("");
 	}
@@ -30,7 +30,7 @@ float getValue(string l, char key){
 	return nanf("");
 }
 
-void drawTower(int tnum, ofstream *ouf){
+void drawTower(int tnum, ofstream *ouf, int epos){
 	*ouf << ";T Draw Tower" << endl;
 	ifstream tow("PurgeTXTs/Tower"+to_string(tnum)+".txt");
 	string l;
@@ -39,6 +39,18 @@ void drawTower(int tnum, ofstream *ouf){
 			*ouf << l << endl;
 		}
 	}
+	*ouf << "G92 E" << epos << endl;
+}
+
+float findLastEpos(ifstream *inf){
+	int pos = inf->tellg();
+	while(inf->peek() != 'E'){
+		inf->unget();
+	}
+	string l;
+	getline(*inf, l);
+	//cout << l << endl;
+	return stof(l.substr(1,13));
 }
 
 int main(){
@@ -51,12 +63,16 @@ int main(){
 	string towers [9][70]; // Tower files are no longer than 70 lines and we have 9 towers
 	string tdir = "PurgeTXTs";
 	string towerNames [9];
+	string lastLine = "";
 
 	float lastz = 0;
 	float zhop = 1;
 	float zpos = 0;
 	float newz = 0;
+	float epos = 0;
+	float newe = 0;
 
+	int seekPos = 0;
 	int swaps = 0;
 	int maxSwaps = 0;
 	int ct = 0; // current tower
@@ -126,12 +142,13 @@ int main(){
 
 		if(gc == "G1"){
 			newz = getValue(l, 'Z');
+			//newe = getValue(l, 'E');
 			if(!isnan(newz) && newz - zpos < zhop - 0.01 && newz != zpos){
 				
 				// fill in the rest of the towers
 				if(swaps < maxSwaps && zpos > 0){
 					for(int i = swaps; i < maxSwaps; ++i){
-						drawTower(i+1, &ouf);
+						drawTower(i+1, &ouf, 0);
 					}
 				}
 				swaps = 0;
@@ -145,7 +162,8 @@ int main(){
 				ltn = tn;
 				swaps++;
 				if(zpos > 0){
-					drawTower(swaps, &ouf);
+					epos = findLastEpos(&inf);
+					drawTower(swaps, &ouf, epos);
 				}
 			}
 		}
