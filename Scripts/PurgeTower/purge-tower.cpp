@@ -53,7 +53,8 @@ float findLastEpos(ifstream *inf){
 	return stof(l.substr(1,13));
 }
 
-int main(){
+int main(int argc, char* argv[]){
+	//cout << argv[1] << endl;
 	
 	ifstream inf("PurgeIn.gcode");
 	ifstream twn("TowerNames.txt"); //cross platform and we dont need extra libs
@@ -82,19 +83,19 @@ int main(){
 
 	string gc;
 
-	int count = 0;
-	while(getline(twn, l)){
-		int tl = 0;
-		string t;
-		towerNames[count] = l;
-		ifstream tow(tdir+"/"+l);
-		while(getline(tow, t)){
-			towers[count][tl]	= t;
-			//cout << towers[count][tl] << endl;
-			tl++;
-		}
-		count++;
-	}
+	//int count = 0;
+	//while(getline(twn, l)){
+	//	int tl = 0;
+	//	string t;
+	//	towerNames[count] = l;
+	//	ifstream tow(tdir+"/"+l);
+	//	while(getline(tow, t)){
+	//		towers[count][tl]	= t;
+	//		//cout << towers[count][tl] << endl;
+	//		tl++;
+	//	}
+	//	count++;
+	//}
 
 	//drawTower(2, &ouf);
 
