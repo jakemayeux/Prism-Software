@@ -1,9 +1,0 @@
-Tower1.txt
-Tower2.txt
-Tower3.txt
-Tower4.txt
-Tower5.txt
-Tower6.txt
-Tower7.txt
-Tower8.txt
-Tower9.txt
