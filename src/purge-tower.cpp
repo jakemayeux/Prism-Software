@@ -72,13 +72,14 @@ vector<float> getVector(string *l, string keys){
 }
 
 // generates a slice of circular tower (no z positioning)
-string genTower(float x, float y, float r, float e){ // x/y pos, radius, feedrate, flowrate
+string genTower(float x, float y, float r, float e, float f){ // x/y pos, radius, flowrate, feedrate
 	string ret = "";
 
 	float lineWidth = 0.4;
 	float dist;
 	float epos = 0;
 	ret = ret + "G92 E0\n";
+	ret = ret + "G1 F"+to_string(f)+"\n";
 	for(float i = 1; i < r; i += lineWidth){
 		dist = M_PI * 2 * i;
 		epos += e*dist;
@@ -332,7 +333,7 @@ int main(int argc, char* argv[]){
 	for(int i = 0; i < maxSwaps; i++){
 		float x = towerCords[i].at(0);
 		float y = towerCords[i].at(1);
-		tower = genTower(x, y, towerRadius, epm);
+		tower = genTower(x, y, towerRadius, epm, 2400);
 		towers.push_back(tower);
 	}
 	
