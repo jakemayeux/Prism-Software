@@ -13,6 +13,7 @@
 
 using namespace std;
 
+// returns the value of key given a line of GCode
 float getValue(string l, char key){
 	smatch m;
 	string s;
@@ -31,12 +32,11 @@ float getValue(string l, char key){
 	return nanf("");
 }
 
+// TODO: make return vector dependent on length of keys
+// TODO: handle unfound keys
+// Parses a line of GCode searching for values specified by keys
 vector<float> getVector(string *l, string keys){
-	//cout << "getVector()" << endl;
 	vector<float> ret(3);
-	//ret[0] = last[0]; //defaults to the last value
-	//ret[1] = last[1];
-	//ret[2] = last[2];
 	int cord = 0; //0: unset 1: X 2: Y 3: Z
 	string num = "";
 	char c;
@@ -62,17 +62,38 @@ vector<float> getVector(string *l, string keys){
 			//num = "5.5";
 		}
 	}
+
+	if(num != ""){
+		ret[cord-1] = stof(num);
+		num = "";
+	}
 	//cout << endl;
 	return ret;
 }
 
-string genTower(float x, float y, float r, float f, float e){ // x/y pos, radius, feedrate, flowrate
-	
+// generates a slice of circular tower (no z positioning)
+string genTower(float x, float y, float r, float e){ // x/y pos, radius, feedrate, flowrate
+	string ret = "";
+
+	float lineWidth = 0.4;
+	float dist;
+	float epos = 0;
+	ret = ret + "G92 E0\n";
+	for(float i = 1; i < r; i += lineWidth){
+		dist = M_PI * 2 * i;
+		epos += e*dist;
+		ret = ret + "G1 X" +to_string(x+i)+ " Y" +to_string(y)+ "\n";
+		ret = ret + "G2 X" +to_string(x+i)+ " Y" +to_string(y)+ " I" +to_string(-i)+ " J0 E" +to_string(epos)+ "\n";
+	}
+	return ret;
 }
 
-float checkVerticalIntersect(vector<vector<float>> *g1, float x, float y){
+// finds the distance between the model and a line perpindicular to the build plate given its x/y pos
+float checkVerticalIntersect(vector<vector<float>> *g1, vector<float> *pos){
 	float minSqrDist = -1;
 	float dist, dx, dy;
+	float x = pos->at(0);
+	float y = pos->at(1);
 	for(int i = 0; i < g1->size(); i++){
 		//cout << g1->at(i)[0];
 		dx = g1->at(i)[0]-x;
@@ -83,21 +104,29 @@ float checkVerticalIntersect(vector<vector<float>> *g1, float x, float y){
 			minSqrDist = dist;
 		}
 	}
-	return minSqrDist;
+	return sqrt(minSqrDist);
 }
 
-void drawTower(int tnum, ofstream *ouf, int epos){
-	*ouf << ";T Draw Tower" << endl;
-	ifstream tow("PurgeTXTs/Tower"+to_string(tnum)+".txt");
-	string l;
-	while(getline(tow, l)){
-		if(l.find('Z') == -1){
-			*ouf << l << endl;
-		}
-	}
+// write the contents of Tower-N to the outfile
+//void drawTower(int tnum, ofstream *ouf, int epos){
+//	*ouf << ";T Draw Tower" << endl;
+//	ifstream tow("PurgeTXTs/Tower"+to_string(tnum)+".txt");
+//	string l;
+//	while(getline(tow, l)){
+//		// dont move along the Z axis
+//		if(l.find('Z') == -1){
+//			*ouf << l << endl;
+//		}
+//	}
+//	*ouf << "G92 E" << epos << endl;
+//}
+void drawTower(string tower, ofstream *ouf, int epos){
+	*ouf << ";Purge Tower" << endl;
+	*ouf << tower << endl;
 	*ouf << "G92 E" << epos << endl;
 }
 
+// seeks backwards until 'E' is found, then returns the value
 float findLastEpos(ifstream *inf){
 	int pos = inf->tellg();
 	while(inf->peek() != 'E'){
@@ -110,6 +139,9 @@ float findLastEpos(ifstream *inf){
 	return stof(l.substr(1,13));
 }
 
+// helper function for getEPerMM
+// receives a sample of gcode containing G1s with X, Y and E values
+// returns the flowrate per 1 mm travel
 float calcEPerMM(vector<vector<float>> *path){
 	float dist = 0;
 	float edist = 0;
@@ -136,6 +168,7 @@ float calcEPerMM(vector<vector<float>> *path){
 	return edist/dist;
 }
 
+// returns extrusion distance per 1 mm travel
 float getEPerMM(ifstream *inf){
 	int pos = inf->tellg();
 	int minSpan = 10;
@@ -170,16 +203,34 @@ float getEPerMM(ifstream *inf){
 	return calcEPerMM(&path);
 }
 
+// polar to cartesian
+vector<float> p2c(float a, float r){
+	vector<float> ret;
+	ret.push_back(r * cos(a));
+	ret.push_back(r * sin(a));
+	return ret;
+}
+
 int main(int argc, char* argv[]){
 	//cout << argv[1] << endl;
 	
-	ifstream inf("PurgeIn.gcode");
-	ifstream twn("TowerNames.txt"); //cross platform and we dont need extra libs
-	ofstream ouf("PurgeOut.gcode");
+	if(argc == 2 && argv[1] == "-h"){
+		cout << "Options:" << endl;
+		cout << "\t-f [outfile]" << endl;
+		cout << "\t-o [infile]" << endl;
+	}
+	
+	for(int i = 0; i < argc; i++){
+		
+	}
+
+	//cout << genTower(5,7,10,100,1) << endl;
+
+	ifstream inf("testGcode/pig.gcode");
+	//ifstream twn("TowerNames.txt"); //cross platform and we dont need extra libs
+	ofstream ouf("out.gcode");
 
 	string l;
-	string towers [9][70]; // Tower files are no longer than 70 lines and we have 9 towers
-	string tdir = "PurgeTXTs";
 	string towerNames [9];
 	string lastLine = "";
 
@@ -199,6 +250,9 @@ int main(int argc, char* argv[]){
 	int maxSwaps = 0;
 	int ct = 0; // current tower
 
+	vector<string> towers;
+	float buildRadius = 100; //mm
+
 	string tn;
 	string ltn = "unset";
 
@@ -210,10 +264,12 @@ int main(int argc, char* argv[]){
 	gpos[1] = 0;
 	gpos[2] = 0;
 
-	cout << "e mm per xy mm " << getEPerMM(&inf) << endl;
-	// find max color swaps and last z for swapping
+	float epm = getEPerMM(&inf);
+	cout << "e mm per xy mm " << epm << endl;
 	
-	inf.seekg(0, inf.beg);
+	//inf.seekg(0, inf.beg);
+	
+	// find max color swaps and last z for swapping
 	while(getline(inf, l)){
 		gc = l.substr(0,l.find(' '));
 
@@ -249,14 +305,43 @@ int main(int argc, char* argv[]){
 	}
 	
 	cout << "max swaps " << maxSwaps << endl;
+	cout << "last z " << lastz << endl;
 
+	float tdist;
+	float towerRadius = 5;
+	float padding = 2;
+	float a = padding + (2 * towerRadius);
+	float b = buildRadius-towerRadius-padding;
+	float angleInc = acos((2*b*b-a*a)/(2*b*b));
+	vector<float> pos(2);
 	vector<vector<float>> towerCords;
-	
-	for(int i = 0; towerCords.size() < maxSwaps; i++){
-		
+	for(int i = 0; i < maxSwaps; ){
+		pos = p2c(angleInc*i, b);
+		tdist = checkVerticalIntersect(&g1, &pos);
+		if(tdist >= a){
+			towerCords.push_back(pos);
+			i++;
+		}else if(angleInc*i > 2*M_PI){
+			cout << "unabel to place towers" << endl;
+			return 0;
+		}
+		cout << tdist << endl;
 	}
+
+	string tower;
+	for(int i = 0; i < maxSwaps; i++){
+		float x = towerCords[i].at(0);
+		float y = towerCords[i].at(1);
+		tower = genTower(x, y, towerRadius, epm);
+		towers.push_back(tower);
+	}
+	
+	//for(int i = 0; towerCords.size() < maxSwaps; i++){
+		
+	//}
 	//cout << "min Sqr Dist " << checkVerticalIntersect(&g1, 100, 100) << endl;
 
+	// reset so we can seek through the file from the beginning
 	inf.clear();
 	inf.seekg(0, inf.beg);
 	zpos = 0;
@@ -277,7 +362,7 @@ int main(int argc, char* argv[]){
 				// fill in the rest of the towers
 				if(swaps < maxSwaps && zpos > 0){
 					for(int i = swaps; i < maxSwaps; ++i){
-						drawTower(i+1, &ouf, 0);
+						drawTower(towers.at(i), &ouf, 0);
 					}
 				}
 				swaps = 0;
@@ -289,11 +374,11 @@ int main(int argc, char* argv[]){
 				ltn = tn;
 			}else if(tn != ltn){
 				ltn = tn;
-				swaps++;
 				if(zpos > 0){
 					epos = findLastEpos(&inf);
-					drawTower(swaps, &ouf, epos);
+					drawTower(towers.at(swaps), &ouf, epos);
 				}
+				swaps++;
 			}
 		}
 		ouf << l << endl;
