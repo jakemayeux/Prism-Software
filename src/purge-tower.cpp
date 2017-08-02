@@ -27,7 +27,7 @@ float getValue(string l, char key){
 	regex e("^[0-9]+\\.?[0-9]*");
 
 	if(regex_search(s, m, e)){
-		cout << "30 stof" << m[0] << endl;
+		//cout << "30 stof" << m[0] << endl;
 		return stof(m[0]);
 	}
 	return nanf("");
@@ -46,7 +46,7 @@ vector<float> getVector(string *l, string keys){
 		c = l->at(i);
 		if(c == 'G' || c == ' ' || c == '\r' || c == '\n'){
 			if(num != ""){
-				cout << "49 stof" << num << endl;
+				//cout << "49 stof" << num << endl;
 				ret[cord-1] = stof(num);
 				num = "";
 			}
@@ -64,7 +64,7 @@ vector<float> getVector(string *l, string keys){
 	}
 
 	if(num != ""){
-		cout << "67 stof" << num << endl;
+		//cout << "67 stof" << num << endl;
 		ret[cord-1] = stof(num);
 		num = "";
 	}
@@ -135,8 +135,8 @@ float findLastEpos(ifstream *inf){
 	inf->seekg(pos);
 	string l;
 	getline(*inf, l);
-	cout << "138 stof" << l.substr(1,13) << endl;
-	return stof(l.substr(1,13));
+	//cout << "138 stof" << l.substr(1,13) << endl;
+	return getValue(l, 'E');
 }
 
 // helper function for getEPerMM
@@ -184,7 +184,7 @@ float getEPerMM(ifstream *inf){
 				v = getVector(&l, "XYE");
 				path.push_back(v);
 				getline(*inf, l);
-				while(l.find('E') != -1 && l.substr(0,2) == "G1"){
+				while(l.find('E') != string::npos && l.substr(0,2) == "G1"){
 					getline(*inf, l);
 					v = getVector(&l, "XYE");
 					path.push_back(v);
