@@ -27,6 +27,7 @@ float getValue(string l, char key){
 	regex e("^[0-9]+\\.?[0-9]*");
 
 	if(regex_search(s, m, e)){
+		cout << "30 stof" << m[0] << endl;
 		return stof(m[0]);
 	}
 	return nanf("");
@@ -42,11 +43,10 @@ vector<float> getVector(string *l, string keys){
 	char c;
 
 	for(int i = 0; i < l->size(); i++){
-		//cout << "asdf" << endl;
 		c = l->at(i);
-		//cout << c;
 		if(c == 'G' || c == ' ' || c == '\r' || c == '\n'){
 			if(num != ""){
+				cout << "49 stof" << num << endl;
 				ret[cord-1] = stof(num);
 				num = "";
 			}
@@ -64,10 +64,10 @@ vector<float> getVector(string *l, string keys){
 	}
 
 	if(num != ""){
+		cout << "67 stof" << num << endl;
 		ret[cord-1] = stof(num);
 		num = "";
 	}
-	//cout << endl;
 	return ret;
 }
 
@@ -96,7 +96,6 @@ float checkVerticalIntersect(vector<vector<float>> *g1, vector<float> *pos){
 	float x = pos->at(0);
 	float y = pos->at(1);
 	for(int i = 0; i < g1->size(); i++){
-		//cout << g1->at(i)[0];
 		dx = g1->at(i)[0]-x;
 		dy = g1->at(i)[1]-y;
 		dist = (dx*dx) + (dy*dy);
@@ -136,7 +135,7 @@ float findLastEpos(ifstream *inf){
 	inf->seekg(pos);
 	string l;
 	getline(*inf, l);
-	//cout << l << endl;
+	cout << "138 stof" << l.substr(1,13) << endl;
 	return stof(l.substr(1,13));
 }
 
@@ -152,9 +151,6 @@ float calcEPerMM(vector<vector<float>> *path){
 	vector<float> v;
 	for(int i = 0; i < path->size(); i++){
 		v = path->at(i);
-		//cout << v[0] << endl;
-		//cout << v[1] << endl;
-		//cout << v[2] << endl;
 		if(last.size() == 0){
 			last.push_back(v[0]);
 			last.push_back(v[1]);
@@ -193,7 +189,6 @@ float getEPerMM(ifstream *inf){
 					v = getVector(&l, "XYE");
 					path.push_back(v);
 					span++;
-					//cout << v[1] << endl;
 				}
 				path.pop_back();
 			}
@@ -213,7 +208,6 @@ vector<float> p2c(float a, float r){
 }
 
 int main(int argc, char* argv[]){
-	//cout << argv[1] << endl;
 	
 	if(argc == 2 && argv[1] == "-h"){
 		cout << "Options:" << endl;
@@ -225,9 +219,9 @@ int main(int argc, char* argv[]){
 		
 	}
 
-	//cout << genTower(5,7,10,100,1) << endl;
 
-	ifstream inf("testGcode/pig.gcode");
+	//ifstream inf("testGcode/pig.gcode");
+	ifstream inf("PurgeIn.gcode");
 	//ifstream twn("TowerNames.txt"); //cross platform and we dont need extra libs
 	ofstream ouf("out.gcode");
 
@@ -326,7 +320,7 @@ int main(int argc, char* argv[]){
 			cout << "unabel to place towers" << endl;
 			return 0;
 		}
-		cout << tdist << endl;
+		//cout << tdist << endl;
 	}
 
 	string tower;
@@ -340,7 +334,6 @@ int main(int argc, char* argv[]){
 	//for(int i = 0; towerCords.size() < maxSwaps; i++){
 		
 	//}
-	//cout << "min Sqr Dist " << checkVerticalIntersect(&g1, 100, 100) << endl;
 
 	// reset so we can seek through the file from the beginning
 	inf.clear();
