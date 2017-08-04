@@ -80,6 +80,7 @@ string genTower(float x, float y, float r, float e, float f){ // x/y pos, radius
 	float epos = 0;
 	ret = ret + "G92 E0\n";
 	ret = ret + "G1 F"+to_string(f)+"\n";
+	ret = ret + "G1 E-1\n";
 	for(float i = 1; i < r; i += lineWidth){
 		dist = M_PI * 2 * i;
 		epos += e*dist;
@@ -108,18 +109,6 @@ float checkVerticalIntersect(vector<vector<float>> *g1, vector<float> *pos){
 }
 
 // write the contents of Tower-N to the outfile
-//void drawTower(int tnum, ofstream *ouf, int epos){
-//	*ouf << ";T Draw Tower" << endl;
-//	ifstream tow("PurgeTXTs/Tower"+to_string(tnum)+".txt");
-//	string l;
-//	while(getline(tow, l)){
-//		// dont move along the Z axis
-//		if(l.find('Z') == -1){
-//			*ouf << l << endl;
-//		}
-//	}
-//	*ouf << "G92 E" << epos << endl;
-//}
 void drawTower(string tower, ofstream *ouf, int epos){
 	*ouf << ";Purge Tower" << endl;
 	*ouf << tower << endl;
@@ -221,7 +210,7 @@ int main(int argc, char* argv[]){
 
 
 	//ifstream inf("testGcode/pig.gcode");
-	ifstream inf("PurgeIn.gcode");
+	ifstream inf("testGcode/pig.gcode");
 	//ifstream twn("TowerNames.txt"); //cross platform and we dont need extra libs
 	ofstream ouf("out.gcode");
 
