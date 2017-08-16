@@ -38,10 +38,12 @@ for o, p in opts:
       infile = p
    elif o in ['-o', '--outfile']:
       outfile = p
+   elif o in ['-c', '--colorfile']:
+      colorfile = p
 
 inf = open(infile, 'r')
 cof = open(colorfile, 'r')
-ouf = open(outfile, 'w')
+ouf = open(outfile, 'w+')
 
 lines = inf.readlines()
 colors = cof.readlines()

@@ -1,38 +1,109 @@
 <!DOCTYPE html>
 <html>
 	<head>
-		<meta charset="UTF-8">
+		<meta charset='UTF-8'>
 		<title>Hello World!</title>
 		<link rel=stylesheet href=style.css>
 	</head>
 
 	<body>
-		<div class=left>
-			<div id=upload class=button>Load GCode</div>
-		</div>
-		<div class=right>
-			<div id=purge class=button>Purge Towers</div>
-			<div id=reorder class=button>Reorder Colors</div>
-			<div id=zmix class=button>ZMixing</div>
-		</div>
-	</body>
 
+		<div class=left>
+			<div id=upload class=button>
+				<label for=fileInput>Load GCode</label>
+				<div id=fileName>no file</div>
+				<input type=file id=fileInput style='display:none'>
+			</div>
+
+			<div class=button id=apply>Apply
+				<svg style='display: none;'
+						id='loader'
+				    x=0 y=0
+				    viewBox='0 0 16 16'
+						width=16 height=16>
+						<defs>
+							<linearGradient id='gradient' x1='0%' y1='0%' x2='100%' y2='0%'>
+								<stop offset='0%'   stop-color='#06a5ff'/>
+								<stop offset='100%' stop-color='#06a5ff' stop-opacity='0'/>
+							</linearGradient>
+						</defs>
+				    <path
+								stroke-width=1.5
+								stroke=url(#gradient)
+								fill=none
+				        d='M 15,8 A 3.5,3.5,0,0,1,1,8'
+				    ></path>
+				</svg>
+			</div>
+			<div class=button id=globalOptions>
+				Global Options
+				<div class=options>
+					File Output: <input id=fileOutput name=-o type=text value='./out.gcode'>
+					ZHop: <input name=--zhop type=number value=1>
+					Build Radius: <input name=--buildRadius type=number value=100>
+				</div>
+			</div>
+		</div>
+
+		<div class=spacer></div>
+
+		<div class=right>
+
+			<div id=reorder class=button>
+				<div class='checkbox checked'></div>Reorder Colors
+				<div class=options>
+					No Serpentine: <input name=--noserpentine type=checkbox>
+				</div>
+			</div>
+
+			<div id=purge class=button>
+				<div class='checkbox checked'></div>Purge Towers
+				<div class=options>
+					Tower Padding: <input name=--padding type=number value=2>
+					Tower Radius: <input name=--radius type=number value=5>
+					Distance to Center: <input name=--centerDist type=number value=90>
+					Tower Feedrate: <input name=--feedRate type=number step=100 value=2400>
+					Retraction: <input name=--retraction type=number value=3>
+				</div>
+			</div>
+
+			<div id=zmix class=button>
+				<div class=checkbox></div>ZMixing
+				<div class=options>
+					Preset:
+					<div id=colors class=dropdown-container>
+						<div class=dropdown>
+							<div class=dropselect></div>
+						</div>
+						<div class=droparrow></div>
+					</div>
+					Preview:
+					<ul id=mixColors>
+					</ul>
+				</div>
+			</div>
+
+
+		</div>
+
+	</body>
+	<script src=color-converter.js></script>
 	<script>
 	require('./renderer.js')
-	const { exec } = require('child_process');
-	var uploadButton = document.querySelector('#upload')
-	
-	window.ondrop = (e) => {
-		e.preventDefault()
-		for (let f of e.dataTransfer.files) {
-			console.log('File(s) you dragged here: ', f.path)
-		}
-		return false;
-	}
-
-	uploadButton.onclick =()=> {
-		console.log('asdf')
-	}
+	//const { exec } = require('child_process');
+	//var uploadButton = document.querySelector('#upload')
+//
+	//window.ondrop = (e) => {
+	//	e.preventDefault()
+	//	for (let f of e.dataTransfer.files) {
+	//		console.log('File(s) you dragged here: ', f.path)
+	//	}
+	//	return false;
+	//}
+//
+	//uploadButton.onclick =()=> {
+	//	console.log('asdf')
+	//}
 
 	</script>
 </html>

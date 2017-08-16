@@ -25,8 +25,8 @@ colorDir = True
 # cli args
 opts, extraparams = getopt.getopt(
    sys.argv[1:],
-   'z:f:o:s',
-   ['zhop', 'infile', 'outfile'])
+   'z:f:o:n',
+   ['zhop', 'infile', 'outfile', 'noserpentine'])
 for o, p in opts:
    if o in ['-z', '--zhop']:
       zhop = p
@@ -34,13 +34,14 @@ for o, p in opts:
       infile = p
    elif o in ['-o', '--outfile']:
       outfile = p
-   elif o in ['-s', '--noserpentine']
+   elif o in ['-n', '--noserpentine']:
       noserp = True
 
-
 inf = open(infile, 'r')
-ouf = open(outfile, 'w')
+ouf = open(outfile, 'w+')
 lines = inf.readlines()
+
+ouf.write(';')
 
 # copied from mixing.py
 def getValue(line, key, default=None):
@@ -60,7 +61,7 @@ def flushAndSort():
    global colorDir
    global data
 
-   if not noserp
+   if not noserp:
       colorDir = not colorDir
    # sort
    keys = sorted(data.keys())
